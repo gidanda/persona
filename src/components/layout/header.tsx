@@ -10,29 +10,26 @@ export function Header() {
   }
 
   return (
-    <header
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 40,
-        background:
-          "linear-gradient(180deg, rgba(9,17,31,0.94) 0%, rgba(9,17,31,0.55) 55%, rgba(9,17,31,0) 100%)",
-        backdropFilter: "blur(1px)",
-      }}
-    >
+    <header style={{ height: 88, position: "relative" }}>
       <div
         style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          maxWidth: 1080,
-          margin: "0 auto",
-          padding: "16px 18px 28px",
+          position: "sticky",
+          top: 0,
+          zIndex: 20,
         }}
       >
-        <h1 style={{ margin: 0, fontSize: 28, letterSpacing: "0.02em" }}>persona</h1>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            maxWidth: 1080,
+            margin: "0 auto",
+            padding: "14px 18px 24px",
+          }}
+        >
+          <h1 style={{ margin: 0, fontSize: 30, letterSpacing: "0.02em" }}>persona</h1>
+        </div>
       </div>
     </header>
   );

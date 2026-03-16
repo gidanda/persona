@@ -6,9 +6,5 @@ export default async function ScanPage() {
   const user = await requireCompletedAppUser();
   const qrValue = buildProfileShareValue(user.userId);
 
-  return (
-    <div style={{ margin: "-84px -18px 0" }}>
-      <ScanSwitcher qrValue={qrValue} />
-    </div>
-  );
+  return <ScanSwitcher qrValue={qrValue} />;
 }
