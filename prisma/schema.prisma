@@ -1,0 +1,92 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AvatarType {
+  generated
+  uploaded
+}
+
+enum AvatarStyle {
+  pixel_classic
+}
+
+enum SnsType {
+  x
+  instagram
+  linkedin
+  other
+}
+
+model User {
+  id                String   @id @db.Uuid
+  userId            String   @unique @map("user_id") @db.VarChar(50)
+  displayName       String   @map("display_name") @db.VarChar(100)
+  realName          String   @map("real_name") @db.VarChar(100)
+  verificationValue String   @map("verification_value") @db.VarChar(255)
+  profileCompleted  Boolean  @default(false) @map("profile_completed")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  // Profile is optional until onboarding completes.
+  profile     Profile?
+  connections Connection[] @relation("UserConnections")
+  partners    Connection[] @relation("PartnerConnections")
+
+  @@map("users")
+}
+
+model Profile {
+  id             String      @id @default(uuid()) @db.Uuid
+  userId         String      @unique @map("user_id") @db.Uuid
+  bio            String?
+  avatarType     AvatarType  @default(generated) @map("avatar_type")
+  avatarStyle    AvatarStyle @default(pixel_classic) @map("avatar_style")
+  avatarSeed     String      @map("avatar_seed") @db.VarChar(100)
+  avatarImageUrl String?     @map("avatar_image_url")
+  createdAt      DateTime    @default(now()) @map("created_at")
+  updatedAt      DateTime    @updatedAt @map("updated_at")
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  snsLinks SnsLink[]
+
+  @@map("profiles")
+}
+
+model SnsLink {
+  id        String   @id @default(uuid()) @db.Uuid
+  profileId String   @map("profile_id") @db.Uuid
+  type      SnsType
+  url       String
+  sortOrder Int      @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId])
+  @@map("sns_links")
+}
+
+model Connection {
+  id            String   @id @default(uuid()) @db.Uuid
+  userId        String   @map("user_id") @db.Uuid
+  partnerUserId String   @map("partner_user_id") @db.Uuid
+  isFavorite    Boolean  @default(false) @map("is_favorite")
+  exchangedAt   DateTime @default(now()) @map("exchanged_at")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  user    User @relation("UserConnections", fields: [userId], references: [id], onDelete: Cascade)
+  partner User @relation("PartnerConnections", fields: [partnerUserId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, partnerUserId])
+  @@index([userId])
+  @@index([partnerUserId])
+  @@map("connections")
+}

@@ -103,9 +103,15 @@ npm install
 環境変数:
 
 ```bash
-DATABASE_URL=
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
+cp .env.local.example .env.local
+```
+
+`.env.local` を作成して、以下を自分の環境に合わせて埋めてください。
+
+```bash
+DATABASE_URL="postgresql://USER:PASSWORD@HOST:5432/DB_NAME?schema=public"
+NEXT_PUBLIC_SUPABASE_URL="https://YOUR_PROJECT_ID.supabase.co"
+NEXT_PUBLIC_SUPABASE_ANON_KEY="YOUR_SUPABASE_ANON_KEY"
 ```
 
 Prisma クライアント生成:
