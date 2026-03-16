@@ -1,9 +1,11 @@
 import type { InputHTMLAttributes } from "react";
 
 export function Input(props: InputHTMLAttributes<HTMLInputElement>) {
+  const { style, ...rest } = props;
+
   return (
     <input
-      {...props}
+      {...rest}
       style={{
         width: "100%",
         padding: "13px 15px",
@@ -18,6 +20,7 @@ export function Input(props: InputHTMLAttributes<HTMLInputElement>) {
         outline: "none",
         position: "relative",
         zIndex: 1,
+        ...style,
       }}
     />
   );

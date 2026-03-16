@@ -27,12 +27,7 @@ export async function QrCodePanel({ value }: QrCodePanelProps) {
         boxShadow: "var(--shadow)",
       }}
     >
-      <div>
-        <h3 style={{ margin: "0 0 8px" }}>My QR</h3>
-        <p style={{ margin: 0, color: "var(--muted)" }}>
-          相手はこの QR を読み取るか、下の共有値を scan 画面に入力すると交換できます。
-        </p>
-      </div>
+      <h3 style={{ margin: 0 }}>My QR</h3>
       <div
         style={{
           display: "grid",

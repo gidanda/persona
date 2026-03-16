@@ -1,9 +1,6 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Avatar } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { routes } from "@/constants/routes";
 import { getExchangeProfile } from "@/features/exchange/actions/exchange-actions";
 
 type ExchangePageProps = {
@@ -43,12 +40,9 @@ export default async function ExchangePage({ params }: ExchangePageProps) {
             <p style={{ margin: 0, color: "var(--muted)" }}>{exchange.partner.realName}</p>
           </div>
         </div>
-        <p style={{ margin: 0, color: "var(--muted)" }}>
-          {exchange.partner.bio || "プロフィール文はまだ設定されていません。"}
-        </p>
-        <p style={{ margin: 0, color: "var(--muted)", fontSize: 14 }}>
-          Exchanged at: {new Date(exchange.exchangedAt).toLocaleString("ja-JP")}
-        </p>
+        {exchange.partner.bio ? (
+          <p style={{ margin: 0, color: "var(--muted)" }}>{exchange.partner.bio}</p>
+        ) : null}
         {exchange.partner.snsLinks.length > 0 ? (
           <section style={{ display: "grid", gap: 10 }}>
             <h3 style={{ margin: 0 }}>SNS Links</h3>
@@ -72,14 +66,6 @@ export default async function ExchangePage({ params }: ExchangePageProps) {
             </div>
           </section>
         ) : null}
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
-          <Link href={routes.contacts}>
-            <Button>交換済み一覧へ</Button>
-          </Link>
-          <Link href={routes.scan}>
-            <Button variant="secondary">別の相手と交換する</Button>
-          </Link>
-        </div>
       </div>
     </section>
   );

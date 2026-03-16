@@ -20,14 +20,8 @@ export default async function SignupPage() {
     >
       <div style={{ display: "grid", gap: 8 }}>
         <h2 style={{ marginBottom: 8 }}>新規登録</h2>
-        <p style={{ color: "var(--muted)" }}>
-          アカウント作成後、プロフィールを整えると交換の準備が完了します。
-        </p>
       </div>
       <SignupForm />
-      <p style={{ margin: 0, color: "var(--muted)", fontSize: 14 }}>
-        user ID はあとで相手に見える識別子です。短く読みやすいものを推奨します。
-      </p>
     </section>
   );
 }

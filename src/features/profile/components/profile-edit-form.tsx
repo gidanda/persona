@@ -57,13 +57,11 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
             outline: "none",
           }}
         />
-        <span style={{ color: "var(--muted)", fontSize: 13 }}>一言で人柄や興味が伝わる短い紹介がおすすめです。</span>
       </label>
 
       <label style={{ display: "grid", gap: 8 }}>
         <span>Avatar Image URL</span>
         <Input defaultValue={profile.avatarImageUrl ?? ""} name="avatarImageUrl" placeholder="Avatar Image URL" type="url" />
-        <span style={{ color: "var(--muted)", fontSize: 13 }}>未入力ならデフォルトアバターのまま利用します。</span>
       </label>
 
       {[0, 1].map((index) => {
@@ -84,9 +82,6 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
             }}
           >
             <strong>SNS Link {index + 1}</strong>
-            <span style={{ color: "var(--muted)", fontSize: 13 }}>
-              交換後に見てほしい導線を優先して設定してください。
-            </span>
             <select
               defaultValue={snsLink?.type ?? "x"}
               name={`snsLinks.${index}.type`}

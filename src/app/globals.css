@@ -29,9 +29,7 @@ body {
     radial-gradient(circle at 85% 12%, rgba(168, 85, 247, 0.34), transparent 24%),
     radial-gradient(circle at 52% 84%, rgba(56, 189, 248, 0.28), transparent 28%),
     linear-gradient(180deg, #09111f 0%, #101827 45%, #141e31 100%);
-  font-family:
-    "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, "Times New Roman",
-    serif;
+  font-family: "Nunito Sans", "Avenir Next", Avenir, "Noto Sans JP", system-ui, sans-serif;
 }
 
 a {

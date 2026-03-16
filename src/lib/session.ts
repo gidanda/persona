@@ -105,5 +105,5 @@ export async function redirectAuthenticatedUser() {
     return;
   }
 
-  redirect(user.profileCompleted ? routes.home : routes.profileEdit);
+  redirect(user.profileCompleted ? routes.contacts : routes.profileEdit);
 }

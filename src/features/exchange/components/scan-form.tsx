@@ -27,7 +27,12 @@ declare global {
   }
 }
 
-export function ScanForm() {
+type ScanFormProps = {
+  autoStart?: boolean;
+  minimal?: boolean;
+};
+
+export function ScanForm({ autoStart = false, minimal = false }: ScanFormProps) {
   const router = useRouter();
   const [state, formAction, isPending] = useActionState(createExchangeAction, initialState);
   const [cameraState, setCameraState] = useState<"idle" | "requesting" | "active" | "unsupported">("idle");
@@ -62,6 +67,14 @@ export function ScanForm() {
       stopCamera();
     };
   }, []);
+
+  useEffect(() => {
+    if (!autoStart) {
+      return;
+    }
+
+    void startCamera();
+  }, [autoStart]);
 
   function stopCamera() {
     if (frameRef.current) {
@@ -328,28 +341,33 @@ export function ScanForm() {
         style={{
           display: "grid",
           gap: 12,
-          padding: 16,
-          borderRadius: 22,
-          border: "1px solid var(--line)",
-          background: "rgba(255,255,255,0.08)",
-          backdropFilter: "blur(20px)",
+          padding: minimal ? 0 : 16,
+          borderRadius: minimal ? 0 : 22,
+          border: minimal ? "none" : "1px solid var(--line)",
+          background: minimal ? "transparent" : "rgba(255,255,255,0.08)",
+          backdropFilter: minimal ? "none" : "blur(20px)",
         }}
       >
-        <div style={{ display: "grid", gap: 8 }}>
-          <strong>カメラ読み取り</strong>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14 }}>
-            まずはここを試し、うまく読めない場合は下の画像アップロードか user ID 入力に切り替えてください。
-          </p>
-        </div>
+        {minimal ? null : (
+          <div style={{ display: "grid", gap: 8 }}>
+            <strong>カメラ読み取り</strong>
+            <p style={{ margin: 0, color: "var(--muted)", fontSize: 14 }}>
+              まずはここを試し、うまく読めない場合は下の画像アップロードか user ID 入力に切り替えてください。
+            </p>
+          </div>
+        )}
         <div
           style={{
             position: "relative",
             overflow: "hidden",
-            borderRadius: 22,
-            minHeight: 240,
-            border: "1px solid rgba(255,255,255,0.18)",
-            background:
-              "linear-gradient(180deg, rgba(15,23,42,0.86) 0%, rgba(17,24,39,0.92) 100%)",
+            borderRadius: minimal ? 0 : 22,
+            minHeight: minimal ? "64vh" : 240,
+            height: minimal ? "64vh" : "auto",
+            width: "100%",
+            border: minimal ? "none" : "1px solid rgba(255,255,255,0.18)",
+            background: minimal
+              ? "rgba(0,0,0,0.15)"
+              : "linear-gradient(180deg, rgba(15,23,42,0.86) 0%, rgba(17,24,39,0.92) 100%)",
             display: "grid",
             placeItems: "center",
           }}
@@ -366,10 +384,14 @@ export function ScanForm() {
             }}
           />
           {cameraState !== "active" ? (
-            <div style={{ padding: 20, textAlign: "center", color: "var(--muted)" }}>
-              {cameraState === "requesting" ? "カメラを起動しています..." : "ここにカメラ映像が表示されます"}
-            </div>
-          ) : (
+            minimal ? (
+              <div aria-hidden="true" />
+            ) : (
+              <div style={{ padding: 20, textAlign: "center", color: "var(--muted)" }}>
+                {cameraState === "requesting" ? "カメラを起動しています..." : "ここにカメラ映像が表示されます"}
+              </div>
+            )
+          ) : minimal ? null : (
             <div
               style={{
                 position: "absolute",
@@ -381,92 +403,84 @@ export function ScanForm() {
             />
           )}
         </div>
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          <Button
-            disabled={cameraState === "requesting" || isPending}
-            onClick={() => {
-              if (cameraState === "active") {
-                stopCamera();
-                setCameraState("idle");
-                setCameraMessage("");
-                return;
-              }
+        {minimal ? null : (
+          <>
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+              <Button
+                disabled={cameraState === "requesting" || isPending}
+                onClick={() => {
+                  if (cameraState === "active") {
+                    stopCamera();
+                    setCameraState("idle");
+                    setCameraMessage("");
+                    return;
+                  }
 
-              void startCamera();
-            }}
-            type="button"
-          >
-            {cameraState === "active" ? "カメラを止める" : "カメラを起動する"}
-          </Button>
-          <label
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: "12px 18px",
-              borderRadius: 999,
-              border: "1px solid var(--line)",
-              background: "rgba(255,255,255,0.08)",
-              cursor: "pointer",
-            }}
-          >
-            画像から読み取る
-            <input
-              accept="image/*"
-              onChange={handleImageUpload}
-              style={{ display: "none" }}
-              type="file"
-            />
-          </label>
-          {(cameraMessage || qrValue) ? (
-            <Button onClick={resetScanState} type="button" variant="secondary">
-              入力をリセット
-            </Button>
-          ) : null}
-        </div>
-        {cameraMessage ? (
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 14 }}>{cameraMessage}</p>
-        ) : null}
-        <div
-          style={{
-            display: "grid",
-            gap: 8,
-            padding: 14,
-            borderRadius: 18,
-            border: "1px solid rgba(255,255,255,0.12)",
-            background: "rgba(255,255,255,0.05)",
-          }}
-        >
-          <strong style={{ fontSize: 14 }}>うまく読めないとき</strong>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 13 }}>
-            PC に表示した QR をスマホで読む場合は、スクリーンショットを保存して「画像から読み取る」を使う方が安定します。
-          </p>
-          <p style={{ margin: 0, color: "var(--muted)", fontSize: 13 }}>
-            それでもだめなら、相手の `@userId` を下の入力欄にそのまま入れて交換できます。
-          </p>
-        </div>
+                  void startCamera();
+                }}
+                type="button"
+              >
+                {cameraState === "active" ? "カメラを止める" : "カメラを起動する"}
+              </Button>
+              <label
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "12px 18px",
+                  borderRadius: 999,
+                  border: "1px solid var(--line)",
+                  background: "rgba(255,255,255,0.08)",
+                  cursor: "pointer",
+                }}
+              >
+                画像から読み取る
+                <input
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  style={{ display: "none" }}
+                  type="file"
+                />
+              </label>
+              {(cameraMessage || qrValue) ? (
+                <Button onClick={resetScanState} type="button" variant="secondary">
+                  入力をリセット
+                </Button>
+              ) : null}
+            </div>
+            {cameraMessage ? (
+              <p style={{ margin: 0, color: "var(--muted)", fontSize: 14 }}>{cameraMessage}</p>
+            ) : null}
+          </>
+        )}
       </div>
 
-      <label style={{ display: "grid", gap: 8 }}>
-        <span style={{ color: "var(--muted)", fontSize: 13, letterSpacing: "0.04em" }}>
-          QR Value or User ID
-        </span>
-        <Input
-          aria-label="QR Value or User ID"
-          name="qrValue"
-          placeholder="tanaka"
-          onChange={(event) => {
-            submittedRef.current = false;
-            setQrValue(event.target.value);
-          }}
-          required
-          value={qrValue}
-        />
-      </label>
-      {state.message ? <ErrorMessage message={state.message} /> : null}
-      <Button disabled={isPending} type="submit">
-        {isPending ? "交換中..." : "交換する"}
-      </Button>
+      {minimal ? (
+        <input name="qrValue" type="hidden" value={qrValue} />
+      ) : (
+        <>
+          <label style={{ display: "grid", gap: 8 }}>
+            <span style={{ color: "var(--muted)", fontSize: 13, letterSpacing: "0.04em" }}>
+              QR Value or User ID
+            </span>
+            <Input
+              aria-label="QR Value or User ID"
+              name="qrValue"
+              placeholder="tanaka"
+              onChange={(event) => {
+                submittedRef.current = false;
+                setQrValue(event.target.value);
+              }}
+              required
+              value={qrValue}
+            />
+          </label>
+          {state.message ? <ErrorMessage message={state.message} /> : null}
+          <Button disabled={isPending} type="submit">
+            {isPending ? "交換中..." : "交換する"}
+          </Button>
+        </>
+      )}
       <canvas ref={canvasRef} style={{ display: "none" }} />
     </form>
   );

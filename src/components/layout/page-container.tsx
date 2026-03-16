@@ -7,7 +7,7 @@ export function PageContainer({ children }: PropsWithChildren) {
         width: "100%",
         maxWidth: 1080,
         margin: "0 auto",
-        padding: "28px 18px 112px",
+        padding: "84px 18px 112px",
       }}
     >
       {children}

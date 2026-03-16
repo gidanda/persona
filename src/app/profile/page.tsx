@@ -1,11 +1,9 @@
 import Link from "next/link";
 
 import { Avatar } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import { IconGear, IconPen } from "@/components/ui/icons";
 import { routes } from "@/constants/routes";
 import { getMyProfile } from "@/features/profile/actions/profile-actions";
-import { QrCodePanel } from "@/features/qr/components/qr-code-panel";
-import { buildProfileShareValue } from "@/features/qr/utils/qr";
 import { requireCompletedAppUser } from "@/lib/session";
 
 export default async function ProfilePage() {
@@ -16,7 +14,6 @@ export default async function ProfilePage() {
     return null;
   }
 
-  const qrValue = buildProfileShareValue(profile.userId);
 
   return (
     <section style={{ display: "grid", gap: 20 }}>
@@ -37,45 +34,60 @@ export default async function ProfilePage() {
           <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
             <Avatar label={profile.displayName} size={88} />
             <div>
-              <p
-                style={{
-                  margin: "0 0 10px",
-                  color: "rgba(255,255,255,0.72)",
-                  fontSize: 12,
-                  letterSpacing: "0.12em",
-                }}
-              >
-                YOUR PERSONA
-              </p>
               <h2 style={{ margin: "0 0 8px" }}>{profile.displayName}</h2>
               <p style={{ margin: "0 0 8px", color: "var(--muted)" }}>@{profile.userId}</p>
               <p style={{ margin: 0, color: "var(--muted)" }}>{profile.realName}</p>
             </div>
           </div>
-          <div
-            style={{
-              padding: "10px 14px",
-              borderRadius: 999,
-              border: "1px solid rgba(255,255,255,0.16)",
-              background: "rgba(255,255,255,0.08)",
-              color: "rgba(255,255,255,0.76)",
-              fontSize: 13,
-              fontWeight: 700,
-            }}
-          >
-            Share Ready
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <Link
+              href={routes.profileEdit}
+              aria-label="Edit profile"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: 36,
+                height: 36,
+                borderRadius: 999,
+                border: "1px solid rgba(255,255,255,0.2)",
+                color: "rgba(255,255,255,0.8)",
+                background: "transparent",
+              }}
+            >
+              <IconPen size={22} />
+            </Link>
+            <Link
+              href={routes.account}
+              aria-label="Account settings"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: 36,
+                height: 36,
+                borderRadius: 999,
+                border: "1px solid rgba(255,255,255,0.2)",
+                color: "rgba(255,255,255,0.8)",
+                background: "transparent",
+              }}
+            >
+              <IconGear size={22} />
+            </Link>
           </div>
         </div>
-        <p
-          style={{
-            margin: 0,
-            color: "rgba(255,255,255,0.88)",
-            fontSize: 18,
-            lineHeight: 1.6,
-          }}
-        >
-          {profile.bio || "自己紹介はまだ設定されていません。プロフィール編集から追加できます。"}
-        </p>
+        {profile.bio ? (
+          <p
+            style={{
+              margin: 0,
+              color: "rgba(255,255,255,0.88)",
+              fontSize: 18,
+              lineHeight: 1.6,
+            }}
+          >
+            {profile.bio}
+          </p>
+        ) : null}
         <div
           style={{
             display: "grid",
@@ -123,14 +135,7 @@ export default async function ProfilePage() {
             <strong>{profile.snsLinks.length} connected</strong>
           </div>
         </div>
-        <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-          <Link href={routes.profileEdit}>
-            <Button>編集する</Button>
-          </Link>
-          <Link href={routes.scan}>
-            <Button variant="secondary">QRを使う</Button>
-          </Link>
-        </div>
+        <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }} />
       </div>
 
       <section
@@ -147,9 +152,6 @@ export default async function ProfilePage() {
       >
         <div style={{ display: "grid", gap: 6 }}>
           <h3 style={{ margin: 0 }}>SNS Links</h3>
-          <p style={{ margin: 0, color: "var(--muted)" }}>
-            交換後に相手がそのままアクセスできるリンクです。
-          </p>
         </div>
         {profile.snsLinks.length > 0 ? (
           <div style={{ display: "grid", gap: 10 }}>
@@ -175,30 +177,9 @@ export default async function ProfilePage() {
               </a>
             ))}
           </div>
-        ) : (
-          <p style={{ margin: 0, color: "var(--muted)" }}>SNS リンクはまだ設定されていません。</p>
-        )}
+        ) : null}
       </section>
 
-      <QrCodePanel value={qrValue} />
-
-      <section
-        style={{
-          padding: 20,
-          borderRadius: 24,
-          border: "1px solid var(--line)",
-          background: "rgba(255,255,255,0.08)",
-          backdropFilter: "blur(20px)",
-          boxShadow: "var(--shadow)",
-        }}
-      >
-        <h3 style={{ marginTop: 0 }}>Account</h3>
-        <div style={{ display: "grid", gap: 8 }}>
-          <p style={{ margin: 0 }}>Display Name: {profile.displayName}</p>
-          <p style={{ margin: 0, color: "var(--muted)" }}>User ID: @{profile.userId}</p>
-          <p style={{ margin: 0, color: "var(--muted)" }}>Real Name: {profile.realName}</p>
-        </div>
-      </section>
     </section>
   );
 }

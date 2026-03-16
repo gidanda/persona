@@ -1,6 +1,6 @@
 type EmptyStateProps = {
   title: string;
-  description: string;
+  description?: string;
 };
 
 export function EmptyState({ title, description }: EmptyStateProps) {
@@ -16,7 +16,7 @@ export function EmptyState({ title, description }: EmptyStateProps) {
       }}
     >
       <h2 style={{ marginTop: 0 }}>{title}</h2>
-      <p style={{ marginBottom: 0, color: "var(--muted)" }}>{description}</p>
+      {description ? <p style={{ marginBottom: 0, color: "var(--muted)" }}>{description}</p> : null}
     </section>
   );
 }

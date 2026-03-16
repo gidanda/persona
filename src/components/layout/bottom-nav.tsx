@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { routes } from "@/constants/routes";
+import { IconMe, IconPeople, IconScan } from "@/components/ui/icons";
 import { getCurrentAppUser } from "@/lib/session";
 
 export async function BottomNav() {
@@ -11,10 +12,9 @@ export async function BottomNav() {
   }
 
   const items = [
-    { href: routes.home, label: "Home" },
-    { href: routes.profile, label: "Profile" },
-    { href: routes.scan, label: "Scan" },
-    { href: routes.contacts, label: "Contacts" },
+    { href: routes.contacts, label: "People", icon: IconPeople },
+    { href: routes.scan, label: "Scan", icon: IconScan },
+    { href: routes.profile, label: "Me", icon: IconMe },
   ];
 
   return (
@@ -27,7 +27,7 @@ export async function BottomNav() {
         margin: "0 auto",
         maxWidth: 720,
         display: "grid",
-        gridTemplateColumns: "repeat(4, 1fr)",
+        gridTemplateColumns: "repeat(3, 1fr)",
         gap: 10,
         padding: 10,
         border: "1px solid var(--line)",
@@ -48,8 +48,12 @@ export async function BottomNav() {
             background: "rgba(255,255,255,0.06)",
             fontSize: 14,
             color: "var(--muted)",
+            display: "grid",
+            gap: 6,
+            justifyItems: "center",
           }}
         >
+          <item.icon />
           {item.label}
         </Link>
       ))}

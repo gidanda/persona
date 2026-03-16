@@ -174,7 +174,7 @@ export async function login(input: LoginInput): Promise<AuthActionState> {
     return {
       ok: true,
       message: "",
-      redirectTo: user?.profileCompleted ? routes.home : routes.profileEdit,
+      redirectTo: user?.profileCompleted ? routes.contacts : routes.profileEdit,
     };
   } catch (error) {
     console.error("login failed", error);
