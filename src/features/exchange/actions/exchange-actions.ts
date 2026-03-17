@@ -125,6 +125,11 @@ export async function getExchangeProfile(token: string) {
                   sortOrder: "asc",
                 },
               },
+              interests: {
+                orderBy: {
+                  sortOrder: "asc",
+                },
+              },
             },
           },
         },
@@ -143,8 +148,11 @@ export async function getExchangeProfile(token: string) {
       displayName: connection.partner.displayName,
       realName: connection.partner.realName,
       bio: connection.partner.profile?.bio ?? "",
+      thinkingNow: connection.partner.profile?.thinkingNow ?? "",
+      doingNow: connection.partner.profile?.doingNow ?? "",
       avatarImageUrl: connection.partner.profile?.avatarImageUrl ?? null,
       snsLinks: connection.partner.profile?.snsLinks ?? [],
+      interests: connection.partner.profile?.interests ?? [],
     },
   };
 }

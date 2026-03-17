@@ -84,6 +84,27 @@ export function IconMe({ size = 20, stroke = "currentColor" }: IconProps) {
   );
 }
 
+export function IconShared({ size = 20, stroke = "currentColor" }: IconProps) {
+  return (
+    <svg
+      aria-hidden="true"
+      height={size}
+      viewBox="0 0 24 24"
+      width={size}
+      fill="none"
+      stroke={stroke}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="1.8"
+    >
+      <path d="M7 12a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Z" />
+      <path d="M17 19a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Z" />
+      <path d="M10 9.5l4 4.2" />
+      <path d="M13.8 7.4 17 5.8" />
+    </svg>
+  );
+}
+
 export function IconPen({ size = 18, stroke = "currentColor" }: IconProps) {
   return (
     <svg

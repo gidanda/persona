@@ -23,6 +23,35 @@ enum SnsType {
   other
 }
 
+enum InterestCategory {
+  music
+  movie
+  book
+  place
+  theme
+  other
+}
+
+enum SharedOrigin {
+  empathy
+  interest
+  recommendation
+  reaction_to_recent
+}
+
+enum SharedSourceContext {
+  profile_interest
+  profile_thinking
+  profile_doing
+  profile_bio
+}
+
+enum SharedState {
+  passive_shared
+  active_thread
+  archived
+}
+
 model User {
   id                String   @id @db.Uuid
   userId            String   @unique @map("user_id") @db.VarChar(50)
@@ -34,9 +63,13 @@ model User {
   updatedAt         DateTime @updatedAt @map("updated_at")
 
   // Profile is optional until onboarding completes.
-  profile     Profile?
-  connections Connection[] @relation("UserConnections")
-  partners    Connection[] @relation("PartnerConnections")
+  profile            Profile?
+  connections        Connection[]    @relation("UserConnections")
+  partners           Connection[]    @relation("PartnerConnections")
+  relationshipsA     Relationship[]  @relation("RelationshipUserA")
+  relationshipsB     Relationship[]  @relation("RelationshipUserB")
+  createdSharedTopics SharedTopic[]  @relation("CreatedSharedTopics")
+  threadMessages     ThreadMessage[] @relation("ThreadMessageSender")
 
   @@map("users")
 }
@@ -45,6 +78,8 @@ model Profile {
   id             String      @id @default(uuid()) @db.Uuid
   userId         String      @unique @map("user_id") @db.Uuid
   bio            String?
+  thinkingNow    String?     @map("thinking_now") @db.VarChar(160)
+  doingNow       String?     @map("doing_now") @db.VarChar(160)
   avatarType     AvatarType  @default(generated) @map("avatar_type")
   avatarStyle    AvatarStyle @default(pixel_classic) @map("avatar_style")
   avatarSeed     String      @map("avatar_seed") @db.VarChar(100)
@@ -52,8 +87,9 @@ model Profile {
   createdAt      DateTime    @default(now()) @map("created_at")
   updatedAt      DateTime    @updatedAt @map("updated_at")
 
-  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  snsLinks SnsLink[]
+  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  snsLinks  SnsLink[]
+  interests ProfileInterest[]
 
   @@map("profiles")
 }
@@ -73,6 +109,28 @@ model SnsLink {
   @@map("sns_links")
 }
 
+model ProfileInterest {
+  id            String           @id @default(uuid()) @db.Uuid
+  profileId     String           @map("profile_id") @db.Uuid
+  category      InterestCategory
+  label         String           @db.VarChar(120)
+  normalizedKey String           @map("normalized_key") @db.VarChar(140)
+  provider      String?          @db.VarChar(40)
+  externalId    String?          @map("external_id") @db.VarChar(120)
+  subtitle      String?          @db.VarChar(180)
+  imageUrl      String?          @map("image_url")
+  deeplinkUrl   String?          @map("deeplink_url")
+  sortOrder     Int              @default(0) @map("sort_order")
+  createdAt     DateTime         @default(now()) @map("created_at")
+  updatedAt     DateTime         @updatedAt @map("updated_at")
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId])
+  @@unique([profileId, sortOrder])
+  @@map("profile_interests")
+}
+
 model Connection {
   id            String   @id @default(uuid()) @db.Uuid
   userId        String   @map("user_id") @db.Uuid
@@ -89,4 +147,61 @@ model Connection {
   @@index([userId])
   @@index([partnerUserId])
   @@map("connections")
+}
+
+model Relationship {
+  id         String   @id @default(uuid()) @db.Uuid
+  userAId    String   @map("user_a_id") @db.Uuid
+  userBId    String   @map("user_b_id") @db.Uuid
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  userA       User          @relation("RelationshipUserA", fields: [userAId], references: [id], onDelete: Cascade)
+  userB       User          @relation("RelationshipUserB", fields: [userBId], references: [id], onDelete: Cascade)
+  sharedTopics SharedTopic[]
+
+  @@unique([userAId, userBId])
+  @@index([userAId])
+  @@index([userBId])
+  @@map("relationships")
+}
+
+model SharedTopic {
+  id              String              @id @default(uuid()) @db.Uuid
+  relationshipId  String              @map("relationship_id") @db.Uuid
+  topicType       String              @map("topic_type") @db.VarChar(40)
+  topicLabel      String              @map("topic_label") @db.VarChar(140)
+  normalizedKey   String              @map("normalized_key") @db.VarChar(160)
+  origin          SharedOrigin
+  sourceContext   SharedSourceContext @map("source_context")
+  state           SharedState         @default(passive_shared)
+  createdByUserId String              @map("created_by_user_id") @db.Uuid
+  lastActivityAt  DateTime            @default(now()) @map("last_activity_at")
+  createdAt       DateTime            @default(now()) @map("created_at")
+  updatedAt       DateTime            @updatedAt @map("updated_at")
+
+  relationship Relationship   @relation(fields: [relationshipId], references: [id], onDelete: Cascade)
+  createdBy   User           @relation("CreatedSharedTopics", fields: [createdByUserId], references: [id], onDelete: Cascade)
+  messages    ThreadMessage[]
+
+  @@unique([relationshipId, sourceContext, normalizedKey])
+  @@index([relationshipId])
+  @@index([lastActivityAt])
+  @@map("shared_topics")
+}
+
+model ThreadMessage {
+  id           String   @id @default(uuid()) @db.Uuid
+  sharedTopicId String   @map("shared_topic_id") @db.Uuid
+  senderUserId String   @map("sender_user_id") @db.Uuid
+  body         String
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  sharedTopic SharedTopic @relation(fields: [sharedTopicId], references: [id], onDelete: Cascade)
+  sender      User        @relation("ThreadMessageSender", fields: [senderUserId], references: [id], onDelete: Cascade)
+
+  @@index([sharedTopicId])
+  @@index([senderUserId])
+  @@map("thread_messages")
 }

@@ -5,5 +5,6 @@ export const routes = {
   profileEdit: "/profile/edit",
   scan: "/scan",
   contacts: "/contacts",
+  shared: "/shared",
   account: "/account",
 } as const;
